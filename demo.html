@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Online Feedback System - No Server Demo</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    :root {
+      --bg: #f3f6ff;
+      --card: #ffffff;
+      --primary: #5b6cff;
+      --primary-dark: #3f50e0;
+      --secondary: #00b3a4;
+      --text: #1f2440;
+      --muted: #66708f;
+      --border: #e7eafb;
+      --danger: #e5484d;
+      --shadow: 0 16px 40px rgba(56, 73, 160, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 10%, #dbe4ff 0%, transparent 35%),
+        radial-gradient(circle at 90% 0%, #d4fff3 0%, transparent 35%),
+        var(--bg);
+      min-height: 100vh;
+    }
+
+    .page {
+      width: min(1180px, 94%);
+      margin: 28px auto 40px;
+    }
+
+    .hero {
+      background: linear-gradient(130deg, #3949db 0%, #5b6cff 55%, #00b3a4 100%);
+      border-radius: 22px;
+      padding: 28px;
+      color: #fff;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.35rem, 2.4vw, 2rem);
+      letter-spacing: 0.2px;
+    }
+
+    .hero p {
+      margin: 0;
+      opacity: 0.95;
+      line-height: 1.55;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 10px 28px rgba(44, 62, 130, 0.08);
+    }
+
+    .panel h2 {
+      margin: 0 0 6px;
+      font-size: 1.2rem;
+      text-align: left;
+    }
+
+    .sub {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 0.93rem;
+    }
+
+    input, textarea, button {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      margin: 8px 0;
+      padding: 12px 13px;
+      font-size: 0.95rem;
+      transition: all .18s ease;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #9aa8ff;
+      box-shadow: 0 0 0 4px rgba(91,108,255,.13);
+    }
+
+    textarea { min-height: 120px; resize: vertical; }
+
+    button {
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      background: linear-gradient(120deg, var(--primary), var(--primary-dark));
+      cursor: pointer;
+    }
+
+    button:hover { transform: translateY(-1px); }
+
+    .notice {
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+
+    .success {
+      color: #0f6b4f;
+      background: #e8fbf4;
+      border: 1px solid #c5f2e2;
+    }
+
+    .error {
+      color: #8d1f2c;
+      background: #ffecef;
+      border: 1px solid #ffc8d2;
+    }
+
+    .hidden { display: none; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .stat {
+      background: #f7f9ff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      text-align: center;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 1.05rem;
+      color: var(--primary-dark);
+    }
+
+    .stat span {
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      margin: 10px 0 14px;
+    }
+
+    .toolbar button {
+      width: auto;
+      padding: 9px 12px;
+      border-radius: 10px;
+      font-size: 0.86rem;
+      margin: 0;
+    }
+
+    .toolbar .soft {
+      background: #f1f4ff;
+      color: var(--primary-dark);
+      border: 1px solid #d9e1ff;
+    }
+
+    .toolbar .danger { background: linear-gradient(120deg, #e5484d, #bf2f35); }
+
+    .table-wrap {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: auto;
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 680px;
+      margin-top: 0;
+    }
+
+    th, td {
+      border-bottom: 1px solid #eef1ff;
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+      font-size: 0.9rem;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #f4f7ff;
+      color: #313a64;
+      border-bottom: 1px solid #e2e8ff;
+    }
+
+    .chip {
+      background: #eef2ff;
+      color: #3949db;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 20px;
+    }
+
+    .row-delete {
+      width: auto;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      background: linear-gradient(120deg, #e5484d, #bf2f35);
+      margin: 0;
+    }
+
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: 1fr 1fr 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .hero { padding: 20px; }
+      .panel { padding: 16px; }
+      .stats { grid-template-columns: 1fr; }
+      .toolbar { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <h1>Online Feedback System • No Server Demo</h1>
+      <p>
+        This polished preview works by opening <code>demo.html</code> directly. It simulates submission,
+        admin login, dashboard listing, and delete actions using browser <code>localStorage</code>.
+      </p>
+    </section>
+
+    <section class="layout">
+      <article class="panel">
+        <h2>📝 Submit Feedback</h2>
+        <p class="sub">Public form preview</p>
+
+        <form id="feedbackForm">
+          <input type="text" id="name" placeholder="Enter your name" required />
+          <input type="email" id="email" placeholder="Enter your email" required />
+          <textarea id="message" placeholder="Enter your feedback" required></textarea>
+          <button type="submit">Submit Feedback</button>
+        </form>
+
+        <p id="submitNotice" class="notice success hidden"></p>
+      </article>
+
+      <article class="panel">
+        <h2>🔐 Admin Panel Demo</h2>
+        <p class="sub">Use credentials: <span class="chip">admin / admin123</span></p>
+
+        <div id="loginView">
+          <form id="loginForm">
+            <input type="text" id="username" placeholder="Enter username" required />
+            <input type="password" id="password" placeholder="Enter password" required />
+            <button type="submit">Login</button>
+          </form>
+          <p id="loginNotice" class="notice error hidden"></p>
+        </div>
+
+        <div id="dashboardView" class="hidden">
+          <div class="stats">
+            <div class="stat"><strong id="totalCount">0</strong><span>Total Feedback</span></div>
+            <div class="stat"><strong id="todayCount">0</strong><span>Today</span></div>
+            <div class="stat"><strong>Demo</strong><span>Mode</span></div>
+          </div>
+
+          <div class="toolbar">
+            <button id="seedBtn" class="soft" type="button">Load Sample Data</button>
+            <button id="clearBtn" class="soft" type="button">Clear All</button>
+            <button id="logoutBtn" class="danger" type="button">Logout</button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Message</th>
+                  <th>Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="feedbackTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const STORAGE_KEY = 'ofs_feedback_demo';
+    const ADMIN_USER = 'admin';
+    const ADMIN_PASS = 'admin123';
+
+    const feedbackForm = document.getElementById('feedbackForm');
+    const submitNotice = document.getElementById('submitNotice');
+    const loginForm = document.getElementById('loginForm');
+    const loginNotice = document.getElementById('loginNotice');
+    const loginView = document.getElementById('loginView');
+    const dashboardView = document.getElementById('dashboardView');
+    const feedbackTableBody = document.getElementById('feedbackTableBody');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const seedBtn = document.getElementById('seedBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const totalCount = document.getElementById('totalCount');
+    const todayCount = document.getElementById('todayCount');
+
+    function getFeedbackItems() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      } catch {
+        return [];
+      }
+    }
+
+    function setFeedbackItems(items) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    }
+
+    function nextId(items) {
+      if (items.length === 0) return 1;
+      return Math.max(...items.map(item => item.id)) + 1;
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function updateStats(items) {
+      totalCount.textContent = String(items.length);
+      const today = new Date().toDateString();
+      todayCount.textContent = String(items.filter(item => new Date(item.created_at).toDateString() === today).length);
+    }
+
+    function renderTable() {
+      const items = getFeedbackItems().sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      updateStats(items);
+
+      if (items.length === 0) {
+        feedbackTableBody.innerHTML = '<tr><td colspan="6" class="empty">No feedback found yet.</td></tr>';
+        return;
+      }
+
+      feedbackTableBody.innerHTML = items.map(item => `
+        <tr>
+          <td>${item.id}</td>
+          <td>${escapeHtml(item.name)}</td>
+          <td>${escapeHtml(item.email)}</td>
+          <td>${escapeHtml(item.message).replace(/\n/g, '<br>')}</td>
+          <td>${new Date(item.created_at).toLocaleString()}</td>
+          <td><button class="row-delete" data-delete-id="${item.id}" type="button">Delete</button></td>
+        </tr>
+      `).join('');
+    }
+
+    feedbackForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const message = document.getElementById('message').value.trim();
+
+      if (!name || !email || !message) return;
+
+      const items = getFeedbackItems();
+      items.push({ id: nextId(items), name, email, message, created_at: new Date().toISOString() });
+      setFeedbackItems(items);
+      feedbackForm.reset();
+
+      submitNotice.textContent = 'Feedback submitted successfully (saved in this browser).';
+      submitNotice.classList.remove('hidden');
+
+      if (!dashboardView.classList.contains('hidden')) renderTable();
+    });
+
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (username === ADMIN_USER && password === ADMIN_PASS) {
+        loginNotice.classList.add('hidden');
+        loginView.classList.add('hidden');
+        dashboardView.classList.remove('hidden');
+        renderTable();
+      } else {
+        loginNotice.textContent = 'Invalid username or password.';
+        loginNotice.classList.remove('hidden');
+      }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      dashboardView.classList.add('hidden');
+      loginView.classList.remove('hidden');
+      loginForm.reset();
+    });
+
+    seedBtn.addEventListener('click', () => {
+      const items = getFeedbackItems();
+      if (items.length > 0) {
+        renderTable();
+        return;
+      }
+
+      const sample = [
+        { id: 1, name: 'Alex', email: 'alex@example.com', message: 'Great site, very easy to use!', created_at: new Date().toISOString() },
+        { id: 2, name: 'Sam', email: 'sam@example.com', message: 'Please add dark mode in the future.', created_at: new Date(Date.now() - 86400000).toISOString() },
+      ];
+      setFeedbackItems(sample);
+      renderTable();
+    });
+
+    clearBtn.addEventListener('click', () => {
+      setFeedbackItems([]);
+      renderTable();
+    });
+
+    feedbackTableBody.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-delete-id]');
+      if (!btn) return;
+
+      const id = Number(btn.getAttribute('data-delete-id'));
+      const items = getFeedbackItems().filter(item => item.id !== id);
+      setFeedbackItems(items);
+      renderTable();
+    });
+  </script>
+</body>
+</html>
