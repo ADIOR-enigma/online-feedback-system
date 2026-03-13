@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Online Feedback System - Demo</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --surface: #ffffff;
+      --surface-soft: #f9fbff;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #dbe4f0;
+      --success-bg: #ecfdf5;
+      --success-text: #047857;
+      --error-bg: #fef2f2;
+      --error-text: #b91c1c;
+      --danger: #dc2626;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .page {
+      width: min(1180px, 94%);
+      margin: 32px auto;
+    }
+
+    .topbar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px 28px;
+      box-shadow: var(--shadow);
+      margin-bottom: 22px;
+    }
+
+    .topbar h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.5rem, 2vw, 2rem);
+      color: var(--text);
+    }
+
+    .topbar p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 780px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 20px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel h2 {
+      margin: 0 0 6px;
+      font-size: 1.2rem;
+      color: var(--text);
+    }
+
+    .sub {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    label {
+      display: block;
+      margin: 12px 0 6px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 0.95rem;
+      background: #fff;
+      color: var(--text);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    input:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #93c5fd;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+    }
+
+    textarea {
+      min-height: 130px;
+      resize: vertical;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 0.94rem;
+      font-weight: 600;
+      transition: 0.2s ease;
+    }
+
+    .primary-btn {
+      width: 100%;
+      margin-top: 16px;
+      padding: 12px 16px;
+      background: var(--primary);
+      color: white;
+    }
+
+    .primary-btn:hover {
+      background: var(--primary-dark);
+    }
+
+    .notice {
+      margin-top: 14px;
+      padding: 11px 13px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+    }
+
+    .success {
+      background: var(--success-bg);
+      color: var(--success-text);
+      border: 1px solid #bbf7d0;
+    }
+
+    .error {
+      background: var(--error-bg);
+      color: var(--error-text);
+      border: 1px solid #fecaca;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .login-chip {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: var(--primary-dark);
+      font-size: 0.82rem;
+      font-weight: 600;
+      border: 1px solid #dbeafe;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .stat {
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 1.15rem;
+      color: var(--primary-dark);
+      margin-bottom: 4px;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .toolbar button {
+      padding: 10px 14px;
+    }
+
+    .soft-btn {
+      background: #eef4ff;
+      color: var(--primary-dark);
+      border: 1px solid #dbeafe;
+    }
+
+    .soft-btn:hover {
+      background: #e0edff;
+    }
+
+    .danger-btn {
+      background: var(--danger);
+      color: white;
+    }
+
+    .danger-btn:hover {
+      background: #b91c1c;
+    }
+
+    .table-wrap {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: auto;
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+    }
+
+    th,
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #eaf0f7;
+      text-align: left;
+      vertical-align: top;
+      font-size: 0.92rem;
+    }
+
+    th {
+      background: #f8fafc;
+      color: #334155;
+      font-weight: 700;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    tbody tr:hover {
+      background: #fafcff;
+    }
+
+    .message-cell {
+      max-width: 280px;
+      line-height: 1.5;
+      color: #334155;
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 24px;
+    }
+
+    .row-delete {
+      padding: 7px 12px;
+      border-radius: 10px;
+      background: var(--danger);
+      color: white;
+      font-size: 0.82rem;
+    }
+
+    .row-delete:hover {
+      background: #b91c1c;
+    }
+
+    @media (max-width: 980px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        width: 94%;
+        margin: 20px auto;
+      }
+
+      .topbar,
+      .panel {
+        padding: 18px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="topbar">
+      <h1>Online Feedback System</h1>
+      <p>
+        This demo presents the user feedback form and admin dashboard interface of the Online Feedback System.
+        It simulates feedback submission, admin login, viewing records, and deleting feedback entries using browser storage.
+      </p>
+    </section>
+
+    <section class="layout">
+      <article class="panel">
+        <h2>Feedback Form</h2>
+        <p class="sub">Users can submit their feedback through this form.</p>
+
+        <form id="feedbackForm">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" placeholder="Enter your full name" required />
+
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="Enter your email address" required />
+
+          <label for="message">Feedback Message</label>
+          <textarea id="message" placeholder="Write your feedback here..." required></textarea>
+
+          <button class="primary-btn" type="submit">Submit Feedback</button>
+        </form>
+
+        <p id="submitNotice" class="notice success hidden"></p>
+      </article>
+
+      <article class="panel">
+        <h2>Admin Panel</h2>
+        <p class="sub">Login credentials: <span class="login-chip">admin / admin123</span></p>
+
+        <div id="loginView">
+          <form id="loginForm">
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="Enter username" required />
+
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter password" required />
+
+            <button class="primary-btn" type="submit">Login</button>
+          </form>
+
+          <p id="loginNotice" class="notice error hidden"></p>
+        </div>
+
+        <div id="dashboardView" class="hidden">
+          <div class="stats">
+            <div class="stat">
+              <strong id="totalCount">0</strong>
+              <span>Total Feedback</span>
+            </div>
+            <div class="stat">
+              <strong id="todayCount">0</strong>
+              <span>Today</span>
+            </div>
+            <div class="stat">
+              <strong>Demo</strong>
+              <span>Status</span>
+            </div>
+          </div>
+
+          <div class="toolbar">
+            <button id="seedBtn" class="soft-btn" type="button">Load Sample Data</button>
+            <button id="clearBtn" class="soft-btn" type="button">Clear All</button>
+            <button id="logoutBtn" class="danger-btn" type="button">Logout</button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Message</th>
+                  <th>Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="feedbackTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const STORAGE_KEY = 'ofs_feedback_demo';
+    const ADMIN_USER = 'admin';
+    const ADMIN_PASS = 'admin123';
+
+    const feedbackForm = document.getElementById('feedbackForm');
+    const submitNotice = document.getElementById('submitNotice');
+    const loginForm = document.getElementById('loginForm');
+    const loginNotice = document.getElementById('loginNotice');
+    const loginView = document.getElementById('loginView');
+    const dashboardView = document.getElementById('dashboardView');
+    const feedbackTableBody = document.getElementById('feedbackTableBody');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const seedBtn = document.getElementById('seedBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const totalCount = document.getElementById('totalCount');
+    const todayCount = document.getElementById('todayCount');
+
+    function getFeedbackItems() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      } catch {
+        return [];
+      }
+    }
+
+    function setFeedbackItems(items) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    }
+
+    function nextId(items) {
+      if (items.length === 0) return 1;
+      return Math.max(...items.map(item => item.id)) + 1;
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function updateStats(items) {
+      totalCount.textContent = String(items.length);
+      const today = new Date().toDateString();
+      todayCount.textContent = String(
+        items.filter(item => new Date(item.created_at).toDateString() === today).length
+      );
+    }
+
+    function renderTable() {
+      const items = getFeedbackItems().sort(
+        (a, b) => new Date(b.created_at) - new Date(a.created_at)
+      );
+
+      updateStats(items);
+
+      if (items.length === 0) {
+        feedbackTableBody.innerHTML =
+          '<tr><td colspan="6" class="empty">No feedback records available.</td></tr>';
+        return;
+      }
+
+      feedbackTableBody.innerHTML = items.map(item => `
+        <tr>
+          <td>${item.id}</td>
+          <td>${escapeHtml(item.name)}</td>
+          <td>${escapeHtml(item.email)}</td>
+          <td class="message-cell">${escapeHtml(item.message).replace(/\n/g, '<br>')}</td>
+          <td>${new Date(item.created_at).toLocaleString()}</td>
+          <td>
+            <button class="row-delete" data-delete-id="${item.id}" type="button">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    feedbackForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const message = document.getElementById('message').value.trim();
+
+      if (!name || !email || !message) return;
+
+      const items = getFeedbackItems();
+      items.push({
+        id: nextId(items),
+        name,
+        email,
+        message,
+        created_at: new Date().toISOString()
+      });
+
+      setFeedbackItems(items);
+      feedbackForm.reset();
+
+      submitNotice.textContent = 'Feedback submitted successfully.';
+      submitNotice.classList.remove('hidden');
+
+      if (!dashboardView.classList.contains('hidden')) {
+        renderTable();
+      }
+    });
+
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (username === ADMIN_USER && password === ADMIN_PASS) {
+        loginNotice.classList.add('hidden');
+        loginView.classList.add('hidden');
+        dashboardView.classList.remove('hidden');
+        renderTable();
+      } else {
+        loginNotice.textContent = 'Invalid username or password.';
+        loginNotice.classList.remove('hidden');
+      }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      dashboardView.classList.add('hidden');
+      loginView.classList.remove('hidden');
+      loginForm.reset();
+    });
+
+    seedBtn.addEventListener('click', () => {
+      const items = getFeedbackItems();
+      if (items.length > 0) {
+        renderTable();
+        return;
+      }
+
+      const sample = [
+        {
+          id: 1,
+          name: 'Rahul Das',
+          email: 'rahul@example.com',
+          message: 'The feedback system is simple, clean, and easy to use.',
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 2,
+          name: 'Priya Sen',
+          email: 'priya@example.com',
+          message: 'The interface is user-friendly and the submission process is smooth.',
+          created_at: new Date(Date.now() - 86400000).toISOString()
+        },
+        {
+          id: 3,
+          name: 'Arijit Roy',
+          email: 'arijit@example.com',
+          message: 'This project demonstrates proper integration of frontend and backend concepts.',
+          created_at: new Date(Date.now() - 2 * 86400000).toISOString()
+        }
+      ];
+
+      setFeedbackItems(sample);
+      renderTable();
+    });
+
+    clearBtn.addEventListener('click', () => {
+      setFeedbackItems([]);
+      renderTable();
+    });
+
+    feedbackTableBody.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-delete-id]');
+      if (!btn) return;
+
+      const id = Number(btn.getAttribute('data-delete-id'));
+      const items = getFeedbackItems().filter(item => item.id !== id);
+      setFeedbackItems(items);
+      renderTable();
+    });
+  </script>
+</body>
+</html>
